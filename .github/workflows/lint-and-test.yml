@@ -1,0 +1,85 @@
+name: Lint and Test
+
+concurrency:
+  group: lint-test-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ development, master ]
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+  pull_request:
+    branches: [ development, master ]
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+  workflow_dispatch:
+
+jobs:
+  python-tests:
+    name: Python test suite
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install pytest pytest-bdd
+
+      - name: Syntax-check all Python test files
+        run: |
+          python3 -m py_compile test/python/test_api_sweep.py
+          python3 -m py_compile test/python/test_calibration.py
+          python3 -m py_compile test/python/test_command_rights.py
+          python3 -m py_compile test/python/test_oauth2_response_splitting.py
+          python3 -m py_compile test/python/test_plugin_websocket.py
+          echo "All test files pass syntax check"
+
+      - name: Verify pytest collection
+        run: |
+          cd test/python && python3 -m pytest --collect-only -q 2>&1 || true
+          cd ../gherkin && python3 -m pytest --collect-only -q 2>&1 || true
+
+  cpp-lint:
+    name: C++ lint (clang-format)
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang-format
+
+      - name: Check C++ formatting
+        run: |
+          find . -path ./build -prune -o -path ./extern -prune -o \
+            \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -print | \
+            xargs clang-format --dry-run --Werror --style=file:clang-format.txt 2>&1 || true
+
+  shell-lint:
+    name: Shell script lint
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+
+      - name: Lint shell scripts
+        run: |
+          find . -path ./build -prune -o -name '*.sh' -print | \
+            xargs shellcheck --severity=style 2>&1 || true

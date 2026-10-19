@@ -1,0 +1,59 @@
+name: Gource visualization
+
+permissions:
+  contents: read
+  actions: read
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # weekly
+  push:
+    branches: [ development, master ]
+
+jobs:
+  gource:
+    name: Generate Gource video
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Generate Gource video
+        uses: nbprojekt/gource-action@v1.3.0
+        with:
+          gource_video_length: 60
+          gource_title: 'Domoticz development timeline'
+          hide_mouse: true
+          hide_date: true
+          hide_filenames: true
+          auto_rotate: true
+          camera-mode: overview
+
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Re-encode with ffmpeg
+        run: |
+          ffmpeg -i gource/gource.mp4 -c:v libx264 -preset slow -crf 18 \
+            -pix_fmt yuv420p -vf "scale=1920:1080" \
+            -c:a aac -b:a 192k -movflags +faststart \
+            domoticz_gource_1080p.mp4
+
+      - name: Upload Gource video
+        uses: actions/upload-artifact@v7
+        with:
+          name: gource-video
+          path: domoticz_gource_1080p.mp4
+          retention-days: 90
+
+      - name: Upload video to release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: domoticz_gource_1080p.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

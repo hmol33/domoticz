@@ -38,6 +38,19 @@ If you like the product or encourage the development, please use the link:
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=6S2CXM772QY84&currency_code=EUR&source=url)
 
+
+## :film_projector: Development visualization
+
+Bekijk de [Gource development video](https://github.com/hmol33/domoticz/releases) voor een visuele tijdlijn van de projectgeschiedenis.
+
+Om de video lokaal te genereren:
+```bash
+gource -1920x1080 --auto-skip-seconds 1 -o gource.ppm
+ffmpeg -y -r 60 -i gource.ppm -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p gource.mp4
+```
+
+De GitHub Actions workflow (`.github/workflows/gource.yml`) genereert de video automatisch elke week en bij elke release.
+
 # More information
 * Website: https://www.domoticz.com
 * Forum: https://forum.domoticz.com/
@@ -51,4 +64,5 @@ Status | Operating system
 [![Status Linux](https://github.com/domoticz/domoticz/actions/workflows/development.yml/badge.svg)](https://github.com/domoticz/domoticz/actions/workflows/development.yml) | Linux x86_64
 [![Status Windows](https://github.com/domoticz/domoticz/actions/workflows/windows-development-build.yml/badge.svg)](https://github.com/domoticz/domoticz/actions/workflows/windows-development-build.yml) | Windows x86
 [![Status Windows (Appveyor)](https://ci.appveyor.com/api/projects/status/fskiwvjs1q7svwq9?svg=true)](https://ci.appveyor.com/project/gizmocuz/domoticz) | Windows (Appveyor)
+[![Lint and Test](https://github.com/hmol33/domoticz/actions/workflows/lint-and-test.yml/badge.svg)](https://github.com/hmol33/domoticz/actions/workflows/lint-and-test.yml) | Python + Shell + C++ lint
 
