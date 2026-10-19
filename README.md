@@ -1,4 +1,7 @@
 # Domoticz — Free Open Source Home Automation System
+<img src="https://img.shields.io/github/stars/hmol33/domoticz?style=flat-square&color=blue" alt="Stars">
+<img src="https://img.shields.io/github/forks/hmol33/domoticz?style=flat-square&color=green" alt="Forks">
+<img src="https://img.shields.io/github/license/hmol33/domoticz?style=flat-square" alt="License">
 
 Domoticz is a free, open source home automation system for Linux, Windows, macOS, and Raspberry Pi. Monitor and control lights, switches, and sensors for temperature, rain, wind, UV, energy, gas, water and much more. Supports 150+ hardware devices including Z-Wave, Zigbee, MQTT, Philips Hue, and RFXCOM. Notifications and alerts can be sent to any mobile device.
 
